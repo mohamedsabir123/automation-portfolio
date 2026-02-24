@@ -158,6 +158,31 @@ Notify completion
 **Outcome:**  
 Ensures automated backup and version history of all automation workflows, preventing data loss and enabling Git-based change tracking.
 
+### Multi-Channel Social Media Publishing Automation
+![Social Media Automation Workflow](images/social-media-multichannel-workflow.png)
+
+Automation workflow that distributes content across multiple social media platforms from a centralized source, enabling consistent omnichannel publishing and tracking.
+
+**Key capabilities:**
+- Central content trigger and scheduling
+- Content formatting per platform requirements
+- Parallel posting to multiple channels
+- Platform-specific API integrations
+- Media and caption handling
+- Status tracking and logging
+- Failure isolation per platform
+- Centralized publishing control
+
+**Supported channels:**
+LinkedIn • Facebook • Instagram • X (Twitter) • YouTube • Pinterest
+
+**Process flow:**
+Content source → Format per platform →  
+Parallel publish → Log results  
+
+**Outcome:**  
+Ensures consistent multi-platform content distribution, reduces manual posting effort, and centralizes social media operations.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
