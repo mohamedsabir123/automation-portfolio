@@ -42,6 +42,29 @@ Automated workflow that monitors customer renewal dates, sends proactive reminde
 **Outcome:**  
 Prevents missed renewals, improves retention follow-ups, and provides a centralized renewal tracking log for operations teams.
 
+### AI Lead Scoring & Automated Assignment Workflow
+![AI Lead Scoring Workflow](images/ai-lead-scoring-workflow.png)
+
+AI-powered lead qualification workflow that analyzes new CRM contacts, calculates engagement-based scores, and automatically assigns leads to the appropriate sales pipeline with notifications.
+
+**Key capabilities:**
+- Webhook trigger for new GoHighLevel contacts
+- Retrieves contact and engagement history
+- Data cleaning and AI input preparation
+- GPT-based lead scoring model
+- Converts AI score into numeric routing logic
+- Segments leads into Hot, Warm, and Cold tiers
+- Automatic tagging and owner assignment in CRM
+- Slack alerts for high-priority (Hot) leads
+
+**Scoring logic:**
+- Score ≥ 80 → Hot lead → Assign to top sales rep + Slack alert  
+- Score 40–79 → Warm lead → Assign to secondary rep  
+- Score < 40 → Cold lead → Assign to nurture pipeline  
+
+**Outcome:**  
+Improves sales response time, prioritizes high-value prospects, and ensures consistent lead distribution without manual triage.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
