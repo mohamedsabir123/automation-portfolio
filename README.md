@@ -346,6 +346,31 @@ Structured Response
 **Outcome:**  
 Enables intelligent ERP self-service support, reduces manual helpdesk load, and provides accurate, context-aware answers from enterprise data.
 
+### AI Recruitment Screening & Applicant Filtering Automation
+![AI Recruitment Screening Workflow](images/ai-recruitment-screening-workflow.png)
+
+End-to-end AI recruitment workflow that ingests applicant resumes from a career portal, extracts and structures candidate data, matches profiles against job openings, and automatically classifies applicants within ERPNext.
+
+**Key capabilities:**
+- Career site applicant webhook intake
+- Resume content extraction (PDF parsing)
+- Structured candidate data processing
+- Resume upload and record creation in ERPNext
+- Job relevance retrieval from ERP openings
+- AI-based candidate-job match scoring
+- Required field validation
+- Automated applicant classification (Accepted / Rejected)
+- ERPNext applicant document creation
+
+**Decision logic:**
+Resume → Extract → Match job →  
+AI score → Validate →  
+Qualified → Accepted applicant  
+Not qualified → Rejected applicant  
+
+**Outcome:**  
+Automates initial HR screening and applicant qualification, reducing manual resume review while ensuring structured hiring decisions in ERP.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
