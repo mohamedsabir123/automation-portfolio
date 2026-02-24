@@ -65,6 +65,29 @@ AI-powered lead qualification workflow that analyzes new CRM contacts, calculate
 **Outcome:**  
 Improves sales response time, prioritizes high-value prospects, and ensures consistent lead distribution without manual triage.
 
+### Universal API Token Expiry Monitoring & Auto-Refresh Automation
+![Token Expiry Workflow](images/token-expiry-workflow.png)
+
+Automated workflow that monitors stored API/OAuth tokens, detects upcoming expirations, refreshes tokens via exchange endpoints, and updates centralized records to maintain uninterrupted integrations.
+
+**Key capabilities:**
+- Scheduled scan of token registry (Google Sheets)
+- Iterates through all stored API tokens
+- Expiry validation and threshold check
+- Conditional refresh logic
+- OAuth token exchange via HTTP request
+- JavaScript transformation of refresh response
+- Automatic token update in registry
+- Failure handling and status tracking
+
+**Process logic:**
+- Valid token → update last-checked timestamp  
+- Expiring/expired token → refresh via API exchange  
+- Store new access token + expiry metadata  
+
+**Outcome:**  
+Prevents integration downtime by ensuring all API tokens remain valid and centrally managed across automation systems.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
