@@ -1,4 +1,4 @@
-# Automation Portfolio — Mohamed Sabirudeen
+# Automation Portfolio — Mohamed - Automation Specialist
 
 Automation Engineer specializing in workflow, integration, and AI automation.
 
