@@ -23,6 +23,7 @@ n8n • Azure OpenAI • ClickUp • GoHighLevel (GHL) • Slack • Email • G
 **Outcome:**  
 Eliminates manual reporting, ensures consistent daily updates, and delivers AI-generated insights automatically to stakeholders.
 
+
 ### Subscription Renewal Reminder & Tracking Automation
 ![Renewal Reminder Workflow](images/renewal-reminder-workflow.png)
 
