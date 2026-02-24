@@ -5,7 +5,7 @@ Automation Engineer specializing in workflow, integration, and AI automation.
 ## Projects
 
 ### AI EOD Reporting & Distribution Automation
-![AI EOD Reporting Workflow](images/AI EOD Reporting & Distribution Automation.png)
+![AI EOD Reporting Workflow](images/AI-EOD-Reporting-Distribution-Automation.png)
 
 Automated end-of-day (EOD) reporting workflow that aggregates task and opportunity data, generates structured AI summaries, and distributes reports across multiple channels.
 
