@@ -111,6 +111,30 @@ Unsafe → Guarded Response
 **Outcome:**  
 Enables automated knowledge-based support, reduces manual query handling, and ensures safe AI interactions with enterprise data.
 
+### AI Lead Scraping, Enrichment & Outreach Automation (Apify)
+![Lead Scraping Workflow](images/apify-lead-scraping-workflow.png)
+
+End-to-end lead generation workflow that scrapes prospects using Apify actors, enriches and structures data with AI extraction, and triggers automated outreach and tracking.
+
+**Key capabilities:**
+- Automated lead scraping via Apify actors
+- Dataset retrieval and iteration
+- Data cleaning and normalization
+- AI-based information extraction & enrichment
+- Lead qualification checks
+- Conditional routing for new vs existing leads
+- Automated email / WhatsApp outreach
+- Lead tracking and logging in Google Sheets
+- Response monitoring and update loop
+
+**Process flow:**
+Scrape → Clean → AI Extract →  
+New Lead → Outreach → Track  
+Existing Lead → Update Records  
+
+**Outcome:**  
+Automates prospect discovery, enriches lead intelligence, and initiates outreach at scale while maintaining a centralized lead database.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
