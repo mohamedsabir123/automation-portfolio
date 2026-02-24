@@ -135,6 +135,29 @@ Existing Lead → Update Records
 **Outcome:**  
 Automates prospect discovery, enriches lead intelligence, and initiates outreach at scale while maintaining a centralized lead database.
 
+### Automated n8n Workflow Backup & Versioning to GitHub
+![Workflow Backup Automation](images/n8n-backup-github-workflow.png)
+
+DevOps automation that periodically exports all n8n workflows and synchronizes them to a GitHub repository for version control, backup, and change tracking.
+
+**Key capabilities:**
+- Scheduled workflow audit trigger
+- Retrieves all workflows via n8n API
+- Iterates through workflow list
+- Creates or updates files in GitHub repository
+- Maintains README index of workflows
+- Version-controlled backup storage
+- Optional email notification on sync completion
+
+**Process flow:**
+Fetch workflows → Loop →  
+Create/update GitHub files →  
+Update README index →  
+Notify completion  
+
+**Outcome:**  
+Ensures automated backup and version history of all automation workflows, preventing data loss and enabling Git-based change tracking.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
