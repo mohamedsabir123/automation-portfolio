@@ -226,6 +226,30 @@ Detect near expiry → Send alert
 **Outcome:**  
 Prevents website downtime and security warnings by ensuring timely SSL certificate renewal across all monitored domains.
 
+### Website Uptime Monitoring & Status Alert Automation
+![Uptime Monitoring Workflow](images/website-uptime-monitoring-workflow.png)
+
+Automated monitoring workflow that checks website availability via HTTP requests, records status changes, and sends targeted alerts to responsible teams when downtime is detected.
+
+**Key capabilities:**
+- Scheduled uptime check trigger
+- Configurable list of monitored websites
+- Iterative HTTP status validation
+- Detects downtime or abnormal responses
+- Retrieves previous status history
+- Change detection logic
+- Centralized status logging (Google Sheets)
+- Conditional alert routing to teams
+- Multi-recipient email notifications
+
+**Process flow:**
+Schedule → Check site →  
+Compare with last status →  
+Log update → Notify owners  
+
+**Outcome:**  
+Enables proactive incident detection, reduces downtime impact, and ensures responsible teams are alerted immediately when sites become unavailable.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
