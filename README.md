@@ -183,6 +183,27 @@ Parallel publish → Log results
 **Outcome:**  
 Ensures consistent multi-platform content distribution, reduces manual posting effort, and centralizes social media operations.
 
+### Automated Server Log Cleanup & Maintenance Workflow
+![Server Log Cleanup Workflow](images/server-log-cleanup-workflow.png)
+
+Scheduled DevOps workflow that identifies outdated server log files and executes remote cleanup commands via SSH to maintain storage health and system performance.
+
+**Key capabilities:**
+- Scheduled maintenance trigger
+- Configurable log retention rules
+- Iterates through server log targets
+- Dynamic command preparation
+- Remote SSH execution
+- Batch log deletion
+- Automated housekeeping loop
+
+**Process flow:**
+Schedule → Identify logs →  
+Loop targets → Execute cleanup via SSH  
+
+**Outcome:**  
+Prevents disk bloat from accumulated logs, maintains server stability, and automates routine infrastructure maintenance tasks.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
