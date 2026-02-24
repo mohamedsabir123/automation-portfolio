@@ -4,25 +4,24 @@ Automation Engineer specializing in workflow, integration, and AI automation.
 
 ## Projects
 
-### AI Resume Processing Automation
-- Built with n8n + APIs
-- Automates resume parsing and data extraction
-- Integrates with external systems
+### AI EOD Reporting & Distribution Automation
+![AI EOD Reporting Workflow](images/1746592314512.png)
 
-### WhatsApp Business Automation
-- Customer interaction automation
-- Order and inquiry workflows
-- API-based messaging automation
+Automated end-of-day (EOD) reporting workflow that aggregates task and opportunity data, generates structured AI summaries, and distributes reports across multiple channels.
 
-### ERP Integration Automation
-- ERP to social media automation
-- Multi-platform posting workflow
-- Scheduled automation pipelines
+**Key capabilities:**
+- Scheduled trigger for automated daily execution
+- Aggregates ClickUp tasks and GHL opportunities
+- Data merging and transformation pipeline
+- AI agent generates structured EOD summaries
+- Multi-channel distribution (Slack, Email, Google Drive)
+- Automated file conversion and cloud upload
 
-### DevOps Monitoring Automation
-- Server and service monitoring
-- Automated alerts and notifications
-- Workflow-based incident handling
+**Tools & integrations:**  
+n8n • Azure OpenAI • ClickUp • GoHighLevel (GHL) • Slack • Email • Google Drive  
+
+**Outcome:**  
+Eliminates manual reporting, ensures consistent daily updates, and delivers AI-generated insights automatically to stakeholders.
 
 ## Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
