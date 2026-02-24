@@ -204,6 +204,28 @@ Loop targets → Execute cleanup via SSH
 **Outcome:**  
 Prevents disk bloat from accumulated logs, maintains server stability, and automates routine infrastructure maintenance tasks.
 
+### Automated SSL Certificate Monitoring & Expiry Alert Workflow
+![SSL Monitoring Workflow](images/ssl-certificate-monitoring-workflow.png)
+
+Scheduled monitoring workflow that checks SSL certificate validity across multiple websites and automatically alerts when certificates approach expiration.
+
+**Key capabilities:**
+- Scheduled SSL audit trigger
+- Configurable list of monitored domains
+- Iterates through website targets
+- HTTPS certificate validation check
+- Expiry date extraction
+- Threshold-based expiry detection
+- Automated email alert notifications
+- Continuous monitoring loop
+
+**Process flow:**
+Schedule → Check SSL per domain →  
+Detect near expiry → Send alert  
+
+**Outcome:**  
+Prevents website downtime and security warnings by ensuring timely SSL certificate renewal across all monitored domains.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
