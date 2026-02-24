@@ -88,6 +88,29 @@ Automated workflow that monitors stored API/OAuth tokens, detects upcoming expir
 **Outcome:**  
 Prevents integration downtime by ensuring all API tokens remain valid and centrally managed across automation systems.
 
+### AI Knowledge Base Chatbot with Safety & RAG Retrieval
+![AI Chatbot Workflow](images/ai-chatbot-workflow.png)
+
+Intelligent chatbot workflow that classifies user intent, applies safety filtering, retrieves knowledge from a vector database, and generates contextual AI responses with structured logging.
+
+**Key capabilities:**
+- Chat trigger for incoming user messages
+- AI intent classification and safety filtering
+- Conditional routing for safe vs restricted queries
+- RAG retrieval from Pinecone vector knowledge base
+- AI agent response generation (OpenAI)
+- Structured output parsing
+- Conversation logging to MySQL
+- Context-aware responses from internal documents
+
+**Architecture:**
+User → Intent & Safety Classifier →  
+Safe → RAG AI Agent → Response  
+Unsafe → Guarded Response  
+
+**Outcome:**  
+Enables automated knowledge-based support, reduces manual query handling, and ensures safe AI interactions with enterprise data.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
