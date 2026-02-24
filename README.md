@@ -318,6 +318,34 @@ Detect upgrades available → Notify admin
 **Outcome:**  
 Ensures servers remain updated and secure by providing proactive visibility into pending package upgrades across infrastructure.
 
+### ERPNext AI Support Assistant with RAG & Tool Integration
+![ERPNext AI Support Chatbot](images/erpnext-ai-support-chatbot.png)
+
+Enterprise AI support chatbot integrated with ERPNext that understands user queries, retrieves contextual knowledge from vector search, executes ERP data tools, and delivers structured responses safely.
+
+**Key capabilities:**
+- Chat trigger for ERP user queries
+- AI intent classification and safety filtering
+- Conditional routing for safe vs restricted requests
+- RAG retrieval from ERP knowledge base (Pinecone)
+- ERPNext data access via custom tools
+- Context-aware AI reasoning with memory
+- Structured output parsing for ERP responses
+- Secure response generation and delivery
+
+**AI architecture:**
+User → Intent & Safety →  
+AI Agent → RAG Retrieval + ERP Tools →  
+Structured Response  
+
+**ERP integrations:**
+- Employee handbook knowledge base
+- ERP data retrieval tools
+- Structured ERP record responses
+
+**Outcome:**  
+Enables intelligent ERP self-service support, reduces manual helpdesk load, and provides accurate, context-aware answers from enterprise data.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
