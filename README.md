@@ -274,6 +274,29 @@ Record incident → Notify engineers
 **Outcome:**  
 Enables proactive detection of server failures, reduces incident response time, and maintains a historical error tracking system.
 
+### Prometheus Metrics Monitoring & Alert Automation
+![Prometheus Monitoring Workflow](images/prometheus-monitoring-workflow.png)
+
+Automated observability workflow that queries Prometheus metrics endpoints, evaluates health thresholds, and triggers alert notifications when anomalies or failures are detected.
+
+**Key capabilities:**
+- Scheduled Prometheus monitoring trigger
+- Iterates through monitored services
+- Prometheus HTTP metrics queries
+- Metric parsing and evaluation logic
+- Threshold-based anomaly detection
+- Conditional alert generation
+- Email notification for incidents
+- Continuous monitoring loop
+
+**Process flow:**
+Schedule → Query Prometheus →  
+Evaluate metrics → Detect breach →  
+Send alert
+
+**Outcome:**  
+Provides automated infrastructure observability by detecting service degradation or outages based on real-time Prometheus metrics.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
