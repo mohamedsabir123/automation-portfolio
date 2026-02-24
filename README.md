@@ -250,6 +250,30 @@ Log update → Notify owners
 **Outcome:**  
 Enables proactive incident detection, reduces downtime impact, and ensures responsible teams are alerted immediately when sites become unavailable.
 
+### Server Error Log Monitoring & Alert Automation
+![Error Log Monitoring Workflow](images/server-error-log-monitoring-workflow.png)
+
+Automated DevOps workflow that scans server error logs via SSH, detects new failure patterns, records incidents, and alerts responsible engineers in real time.
+
+**Key capabilities:**
+- Scheduled log scan trigger
+- Remote error log retrieval via SSH
+- Iterative parsing of log entries
+- Error pattern detection logic
+- Comparison with previously recorded incidents
+- Deduplication of known errors
+- Incident logging to central datastore
+- Conditional routing to responsible teams
+- Targeted email notifications
+
+**Process flow:**
+Schedule → Fetch logs →  
+Parse errors → Check new vs known →  
+Record incident → Notify engineers  
+
+**Outcome:**  
+Enables proactive detection of server failures, reduces incident response time, and maintains a historical error tracking system.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
