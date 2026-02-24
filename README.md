@@ -23,7 +23,25 @@ n8n • Azure OpenAI • ClickUp • GoHighLevel (GHL) • Slack • Email • G
 **Outcome:**  
 Eliminates manual reporting, ensures consistent daily updates, and delivers AI-generated insights automatically to stakeholders.
 
-## Tools
+### Subscription Renewal Reminder & Tracking Automation
+![Renewal Reminder Workflow](images/renewal-reminder-workflow.png)
+
+Automated workflow that monitors customer renewal dates, sends proactive reminders, alerts internal teams, and logs outcomes for tracking and reporting.
+
+**Key capabilities:**
+- Daily scheduled scan of GoHighLevel contacts
+- Detects upcoming renewals within 10 days
+- Filters contacts with renewal metadata
+- Automated customer renewal email via Gmail
+- Internal Slack alerts for team visibility
+- Consolidates notification results
+- Generates summary report
+- Logs renewal activity to Google Sheets
+
+**Outcome:**  
+Prevents missed renewals, improves retention follow-ups, and provides a centralized renewal tracking log for operations teams.
+
+Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
 📩 Open to freelance & collaboration in automation
