@@ -297,6 +297,27 @@ Send alert
 **Outcome:**  
 Provides automated infrastructure observability by detecting service degradation or outages based on real-time Prometheus metrics.
 
+### Server Package Upgrade Monitoring & Alert Automation
+![Server Upgrade Monitoring Workflow](images/server-upgrade-monitoring-workflow.png)
+
+Scheduled infrastructure workflow that checks servers for pending package upgrades via SSH and alerts administrators when updates are available.
+
+**Key capabilities:**
+- Scheduled server maintenance trigger
+- Iterates through managed servers
+- Remote package upgrade check via SSH
+- Detects pending system updates
+- Conditional alert logic
+- Email notification to administrators
+- Continuous monitoring loop
+
+**Process flow:**
+Schedule → Check server packages →  
+Detect upgrades available → Notify admin  
+
+**Outcome:**  
+Ensures servers remain updated and secure by providing proactive visibility into pending package upgrades across infrastructure.
+
 Tools
 n8n • Zapier • APIs • Webhooks • Python • SQL
 
