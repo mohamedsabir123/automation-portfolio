@@ -1,0 +1,455 @@
+{
+  "name": "ADMIN_MDS - TechSparks Enrichment & Outreach",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a6e8d27d-f4be-4652-a5ad-3bd7352a74f8",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://techsparks.yourstory.com/2025#Speakers",
+        "options": {}
+      },
+      "id": "3886e90f-cf2a-4a5c-a48f-6f238c1671ba",
+      "name": "Fetch TechSparks Speakers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        144,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data || \"\";\n\nconst nameMatches = [...html.matchAll(\n  /<div[^>]*class=[\"'][^\"']*ts_speaker-title[^\"']*[\"'][^>]*>(.*?)<\\/div>/gis\n)];\n\nconst descMatches = [...html.matchAll(\n  /<div[^>]*class=[\"'][^\"']*ts_speaker-desc[^\"']*[\"'][^>]*>(.*?)<\\/div>/gis\n)];\n\n// Decode HTML entities\nfunction decodeHtml(str) {\n  if (!str) return str;\n  return str\n    .replace(/&#x27;|&#39;/g, \"'\")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&quot;/g, '\"')\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\");\n}\n\n// Clean text\nfunction clean(text) {\n  return decodeHtml(\n    text.replace(/<[^>]+>/g, \"\").replace(/\\s+/g, \" \").trim()\n  );\n}\n\n// Split title + company\nfunction splitTitleCompany(text) {\n  if (!text) return { title: null, company: null };\n\n  const idx = text.indexOf(\",\");\n  if (idx === -1) {\n    return { title: text.trim(), company: null };\n  }\n\n  return {\n    title: text.slice(0, idx).trim(),\n    company: text.slice(idx + 1).trim()\n  };\n}\n\nconst speakers = [];\n\nfor (let i = 0; i < nameMatches.length; i++) {\n  const name = clean(nameMatches[i][1]);\n  const desc = descMatches[i] ? clean(descMatches[i][1]) : null;\n  const { title, company } = splitTitleCompany(desc);\n\n  speakers.push({\n    name,\n    title,\n    company\n  });\n}\n\nreturn [{ speakers }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        496
+      ],
+      "id": "e2b1b640-cf76-429b-b2ad-6c0175a54064",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "speakers",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        496,
+        496
+      ],
+      "id": "5c7df990-90ba-4f61-900a-0414a84cfd26",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        672,
+        496
+      ],
+      "id": "0fe8e225-d0e0-47dc-a49d-0014c511d219",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are enriching and preparing ABM outreach data.\n\nPerson:\nName: {{ $('Loop Over Items').item.json.name }}\nTitle: {{ $('Loop Over Items').item.json.title }}\nCompany: {{ $('Loop Over Items').item.json.company }}\nDomain: {{$json.domain}}\n\nTasks:\n\n1) Infer seniority from title:\n- CEO/Founder/Chief/Minister/President → Executive\n- VP → VP\n- Director/Head → Director\n- else → Manager\n\n2) Infer industry from company name:\n- Tech/software/data/AI → Technology\n- Capital/ventures/invest → Investment\n- Govt/ministry/India → Public Sector\n- university/institute → Education\n- else → Unknown\n\n3) Generate LinkedIn search URL:\nhttps://www.linkedin.com/search/results/all/?keywords=Name Company\n\n4) Create signals:\n\"Title at Company\"\n\n5) Derive persona (role archetype):\nExamples:\n- Minister / Govt leadership → Public sector policymaker\n- CTO / Chief / Tech leader → Technology decision maker\n- Investor / Partner → Investment leader\n- Academic leader → Education leader\nElse → Business leader\n\n6) Derive segment (ABM bucket):\nExamples:\n- Govt / ministry → Government & Public Infrastructure\n- Airline / aviation / mobility → Aviation & Mobility\n- Tech / SaaS / AI → Technology\n- Investment / VC → Investment\n- University → Education\nElse → General Business\n\n7) Derive priority:\n- Executive + Govt/Investment/Tech → High\n- VP/Director → Medium\n- Manager/Unknown → Low\n\n8) Keep status = \"ready_for_outreach\"\n9) Keep source = \"TechSparks 2025\"\n\n10) Also include:\n- insight\n- outreach\n\nReturn JSON ONLY:\n{\n  \"name\": \"\",\n  \"title\": \"\",\n  \"company\": \"\",\n  \"domain\": \"\",\n  \"seniority\": \"\",\n  \"industry\": \"\",\n  \"persona\": \"\",\n  \"segment\": \"\",\n  \"priority\": \"\",\n  \"linkedin\": \"\",\n  \"signals\": \"\",\n  \"status\": \"ready_for_outreach\",\n  \"source\": \"TechSparks 2025\",\n  \"insight\": \"\",\n  \"outreach\": \"\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        512
+      ],
+      "id": "90e87473-ef5d-4695-b832-fd8949d13b6c",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "e1vEhu1ptTggMzO8",
+          "name": "ADMIN_N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output[0].content[0].text;\n\n// Extract JSON object from text\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\n\nif (!match) {\n  throw new Error(\"No JSON found in AI output\");\n}\n\nconst parsed = JSON.parse(match[0]);\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        512
+      ],
+      "id": "bad8d6fe-6b3a-49a3-8885-fba20fefe9fc",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "TvSk1LdbGegAB40R",
+          "mode": "list",
+          "cachedResultName": "TechSparks Speakers list",
+          "cachedResultUrl": "/projects/dEY01DZKSoTlcIgS/datatables/TvSk1LdbGegAB40R"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Title": "={{ $json.title }}",
+            "Company": "={{ $json.company }}",
+            "Domain": "={{ $json.domain }}",
+            "Logo": "={{ $('Get Site').first().json.logo }}",
+            "Insight": "={{ $json.insight }}",
+            "Outreach": "={{ $json.outreach }}",
+            "seniority": "={{ $json.seniority }}",
+            "industry": "={{ $json.industry }}",
+            "persona": "={{ $json.persona }}",
+            "segment": "={{ $json.segment }}",
+            "signals": "={{ $json.signals }}",
+            "priority": "={{ $json.priority }}",
+            "status": "={{ $json.signals }}",
+            "source": "={{ $json.source }}",
+            "linkedin": "={{ $json.linkedin }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Logo",
+              "displayName": "Logo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Insight",
+              "displayName": "Insight",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Outreach",
+              "displayName": "Outreach",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "seniority",
+              "displayName": "seniority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "industry",
+              "displayName": "industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "persona",
+              "displayName": "persona",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "segment",
+              "displayName": "segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "signals",
+              "displayName": "signals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "linkedin",
+              "displayName": "linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        512
+      ],
+      "id": "61f22ebe-32df-4cf5-871d-3eab138bc09a",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "url": "=https://autocomplete.clearbit.com/v1/companies/suggest?query={{$json.company}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        880,
+        512
+      ],
+      "id": "9c1f3f3e-1ff5-4b81-9f1f-91f8b76f3c75",
+      "name": "Get Site",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch TechSparks Speakers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch TechSparks Speakers": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get Site",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Site": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "86408b0f-adc2-46e2-90a1-c0277481e879",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f396997812cc19e1d10c072f552dce82a7580904c0d7c42ad49f248293b02614"
+  },
+  "id": "74OMBeuZ4jfQBi2O",
+  "tags": []
+}
