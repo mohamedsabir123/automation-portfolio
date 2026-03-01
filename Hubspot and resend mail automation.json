@@ -1,0 +1,1111 @@
+{
+  "name": "Hubspot and resend mail automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f4eee2db-9c84-48a5-bc3b-444910d98656",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        2944
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "operation": "getAll",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        2944
+      ],
+      "id": "3313e2e7-48f1-433b-a90e-ddb3b87412ab",
+      "name": "Get many contacts",
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "l7pwfqN6bz3B2PHM",
+          "name": "HubSpot App Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const contacts = $input.all();\n\nconst results = contacts.map(c => {\n  const props = c.json.properties || {};\n  const identities = c.json[\"identity-profiles\"]?.[0]?.identities || [];\n\n  const emailObj = identities.find(i => i.type === \"EMAIL\");\n\n  return {\n    json: {\n      firstname: props.firstname?.value || \"\",\n      lastname: props.lastname?.value || \"\",\n      name: `${props.firstname?.value || \"\"} ${props.lastname?.value || \"\"}`.trim(),\n      email: emailObj?.value || \"\",\n      company: props.company?.value || \"\"\n    }\n  };\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        2944
+      ],
+      "id": "c9fa2f88-abbd-4389-a078-ba7f2f12491f",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2176,
+        2944
+      ],
+      "id": "56b242e6-2f17-4bd7-806b-dc010c95d6d5",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "from": "onboarding@resend.dev",
+        "to": "=sabirudeenm@gmail.com",
+        "subject": "Quick intro to Anakin",
+        "emailFormat": "text",
+        "text": "=Hi {{ $json.firstname }},\n\nI wanted to briefly introduce Anakin — a platform that helps consumer and ecommerce brands optimize pricing, assortment, and competitive positioning using real-time market and product intelligence.\n\nTeams use Anakin to monitor competitor pricing, track assortment gaps, and generate actionable insights that improve revenue and margin decisions across marketplaces and digital shelves.\n\nIf this area is relevant to your work, I’d be happy to share more or connect you with the team for a quick overview.\n\nBest regards,\nAnakin (YC S21) ",
+        "additionalOptions": {}
+      },
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        3040
+      ],
+      "id": "34ac7f2a-8d80-4ba5-a411-09387fb150a6",
+      "name": "Send a new email",
+      "webhookId": "c24d04ff-2a2f-499f-9016-9f25597c9a8f",
+      "credentials": {
+        "resendApi": {
+          "id": "dsnWiaviY3dDqXGb",
+          "name": "Resend account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Sales Lead Analysis AI Agent for a software company.\n\nCompany Name: Ethical Intelligent Technologies\nService Offered: Software solutions including ERP, automation, CRM, and custom software.\n\nYour task is to analyze an incoming email reply from a cold email campaign and determine whether the sender should be accepted as a lead.\n\nPRIMARY RULE (MOST IMPORTANT):\n\nAny explicit or implicit expression of interest MUST be accepted as a lead.\nIf the sender shows curiosity, asks for more details, requests information, mentions future discussion, or expresses openness, treat them as a lead.\n\nOnly reject when there is clearly no interest or no meaningful content.\n\nINPUT DATA:\n\nEmail Subject:\n{{ $('Response Mail').item.json.subject }}\n\nEmail Body:\n{{ $('Response Mail').item.json.textPlain }}\n\nSender Email:\n{{ $json.from.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i)[0] }}\n\nSPAM & INVALID CONTENT RULE (OVERRIDES ALL OTHER RULES):\n\nReject the email as NOT a lead if ANY of the following are true:\n\n- The email body contains only test messages (e.g. “test”, “testing”)\n- Repeated or meaningless words with no readable sentences\n- Random characters or gibberish\n- Auto-reply messages (out of office, delivery failure, etc.)\n- Job applications, vendor sales emails, newsletters, or internal test emails\n- No business-related language and no meaningful intent\n\nSuch emails must be classified as:\n\nis_lead: false\ninterest_level: none\nintent: none\nnext_action: ignore\nLead_title: null\nOrganization: null\nWebsite: null\nTerritory: null\nIndustry: null\nJob_title: null\nSource: null\nLead_Owner: null\nType: null\n\nAllowed values ONLY:\n\ninterest_level: high | medium | low | none\nintent: demo | pricing | callback | information | none\nnext_action: schedule_call | send_details | follow_up | ignore\nIndustry: Education | Financial Services | Service | Software | Sports | Technology | Telecommunications | Television\nLead_Owner: sabirudeen@ethicalinteligent.com\nSource: Lead Scrapping Response Mail - N8N\nType: IOT | Non IOT\nfirst_name: name\nwhat_they_want: very short description\n\n\nMINIMUM ENGAGEMENT REQUIREMENT:\n\nTo be considered a lead, the email must contain at least ONE of the following:\n\n- A complete readable sentence\n- A business-related word or context\n- A question or request\n- Reference to services, problems, discussion, or next steps\n\nIf none are present, reject the email as non-lead.\n\nANALYSIS GUIDELINES:\n\n- Identify interest, curiosity, openness, or willingness to learn more.\n- Soft signals like “share details”, “sounds interesting”, “let’s talk”, or “connect later” are VALID interest.\n- Explicit rejections (“not interested”, “do not contact”) indicate no lead.\n- Do NOT judge budget, authority, or timeline.\n- Do NOT invent intent or interest not present in the email.\n\nCLASSIFICATION RULES:\n\n- Accept as a lead if there is any form of meaningful interest or engagement.\n- Reject only if the email is clearly uninterested, spam, or non-business.\n- Ambiguous BUT meaningful emails should be accepted as leads.\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1504,
+        4048
+      ],
+      "id": "0147e781-562a-4c95-8919-089218b6331b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1440,
+        4256
+      ],
+      "id": "caa359db-4831-414b-9f8b-b7cb459ebdbe",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "e1vEhu1ptTggMzO8",
+          "name": "ADMIN_N8N"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A",
+          "mode": "list",
+          "cachedResultName": "Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email address": "={{ $json['Email address'] }}",
+            "Response": "={{ $('AI Agent').item.json.output.what_they_want }}"
+          },
+          "matchingColumns": [
+            "Email address"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email address",
+              "displayName": "Email address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Sent time",
+              "displayName": "Sent time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Response",
+              "displayName": "Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2432,
+        3952
+      ],
+      "id": "815e6c65-d318-4409-866b-f2c43137736e",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "maoU8I6yc1k1frlB",
+          "name": "eitworks3@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A",
+          "mode": "list",
+          "cachedResultName": "Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email address",
+              "lookupValue": "={{ $('Response Mail').item.json.from.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i)[0] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2032,
+        4032
+      ],
+      "id": "bfb32772-07d9-41c3-a70e-9220f2c69d4f",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "maoU8I6yc1k1frlB",
+          "name": "eitworks3@gmail.com"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{ \n  \"is_lead\": true, \n  \"interest_level\": \"high | medium | low | none\", \n  \"intent\": \"demo | pricing | callback | information | none\", \n  \"next_action\": \"schedule_call | send_details | follow_up | ignore\",\n  \"Lead_title\": \"EIT\",\n  \"Organization\": \"Organization\",\n  \"Website\": \"Website.com\",\n  \"Territory\": \"India\",\n  \"Industry\": \"Education | Financial Services | Service | Software | Sports | Technology | Telecommunications | Television\",\n  \"Job_title\": \"Job_title\",\n  \"Source\": \"Lead Scrapping Response Mail - N8N\",\n  \"Lead_Owner\": \"sabirudeen@ethicalinteligent.com\",\n  \"Type\": \"IOT | Non IOT\",\n  \"first_name\": \"name\",\n  \"what_they_want\": \"very short description\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        4256
+      ],
+      "id": "17286170-43c3-4d4c-a55d-d972c05efd8c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "881f50a4-8b45-46be-a685-608ff4b552b7",
+              "leftValue": "={{ $json.output.is_lead }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1808,
+        4048
+      ],
+      "id": "4efeb4e8-15ab-4a6b-9db4-89a369daf095",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8ee13fdb-f5a6-4f94-9125-da8d7aa4e715",
+              "leftValue": "={{ $json['Email address'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2208,
+        4032
+      ],
+      "id": "30524c59-ed14-4ffd-aca7-bcac3ef62c46",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "docType": "CRM%20Lead",
+        "properties": {
+          "customProperty": [
+            {
+              "field": "=custom_lead_title",
+              "value": "={{ $('If2').item.json.output.Organization }} - {{ $('If2').item.json.output.what_they_want }}"
+            },
+            {
+              "field": "organization",
+              "value": "={{ $('If2').item.json.output.Organization }}"
+            },
+            {
+              "field": "website",
+              "value": "={{ $('If2').item.json.output.Website }}"
+            },
+            {
+              "field": "territory",
+              "value": "={{ $('If2').item.json.output.Territory }}"
+            },
+            {
+              "field": "job_title",
+              "value": "={{ $('If2').item.json.output.Job_title }}"
+            },
+            {
+              "field": "lead_owner",
+              "value": "={{ $('If2').item.json.output.Lead_Owner }}"
+            },
+            {
+              "field": "=custom_type",
+              "value": "={{ $('If2').item.json.output.Type }}"
+            },
+            {
+              "field": "source",
+              "value": "={{ $('If2').item.json.output.Source }}"
+            },
+            {
+              "field": "first_name",
+              "value": "={{ $('If2').item.json.output.first_name }}"
+            },
+            {
+              "field": "industry",
+              "value": "={{ $('If2').item.json.output.Industry }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.erpNext",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        4048
+      ],
+      "id": "a08b5021-eea3-418b-b0f7-79d31b22fc48",
+      "name": "New lead",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A",
+          "mode": "list",
+          "cachedResultName": "Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Response",
+              "lookupValue": "Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        4688
+      ],
+      "id": "252dd2cf-8ebc-4ac8-b431-4d8e22b291ff",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "maoU8I6yc1k1frlB",
+          "name": "eitworks3@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1712,
+        4688
+      ],
+      "id": "9a3ca194-0c67-4e20-a0c1-81149cf819e5",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "fromEmail": "info@ethicalintelligent.com",
+        "toEmail": "smsabir2000@gmail.com",
+        "subject": "={{ $json.output[\"Mail Subject\"] }}",
+        "emailFormat": "text",
+        "text": "={{ $json.output[\"Mail Body\"] }}",
+        "options": {
+          "appendAttribution": false,
+          "attachments": "data"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2448,
+        4688
+      ],
+      "id": "966166bc-c5e9-4122-94b7-c77e2aa302b3",
+      "name": "Send email1",
+      "webhookId": "2c23c0cb-5aaa-4cf9-a53b-1ac64be687a4",
+      "credentials": {
+        "smtp": {
+          "id": "JzfhXfUJFlis8C2Z",
+          "name": "info@ethicalintelligent.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are a professional B2B follow-up cold email generator for a software company.\n\nContext:\nThis is a follow-up email to a previously sent cold email that received no response.\nThe previous email content is provided for context only.\nDo NOT repeat the old email.\nDo NOT quote it verbatim.\nSimply acknowledge it naturally (e.g., “Following up on our earlier note…”).\n\nPrevious Email Content:\n{{ $json['Mail Content Sent '] }}\n\nCompany Information:\nYour Company Name: Ethical Intelligent Technologies\nYour Service: Software solutions for {{ $json.Category }} companies\n\nRecipient Information:\nCompany Name: {{ $json['Company Name'] }}\nBusiness Type: {{ $json.Category }}\n\nEmail Requirements:\n- Begin with:\n  \"Hi {{ $json['Company Name'] }},\"\n- Use \"We\" instead of \"I\" throughout the email\n- Clearly indicate this is a follow-up to the previous email\n- Highlight that many {{ $json.Category }} companies miss opportunities to:\n  - streamline operations\n  - reduce operational costs\n  - improve project visibility and efficiency\n- Position Ethical Intelligent Technologies as a helpful partner, not a hard seller\n- Keep the tone professional, concise, and value-driven\n- Include a soft call-to-action (reply, short call, or confirmation of interest)\n- Avoid aggressive, pushy, or spam-like language\n\nEnd with the signature:\nEthical Intelligent Technologies\n\nTask:\nGenerate a follow-up email including:\n\nMail Subject:\nMail Body:\n\nOutput Rules:\n- Always return exactly two fields:\n  Mail Subject:\n  Mail Body:\n- Do NOT include explanations or extra text\n",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Mail Subject",
+              "description": "Eye catchy mail Subject for the cold mail",
+              "required": true
+            },
+            {
+              "name": "Mail Body",
+              "description": "=body message of the mail, a perfect and clear cold mail.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ad202953-e51b-44f6-b197-030d1279d5b2",
+      "name": "Information Extractor2",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        2144,
+        4688
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "ad220bd5-8249-4d4a-8a40-97c9d5f4f769",
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2096,
+        4928
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "postProcessAction": "nothing",
+        "downloadAttachments": true,
+        "options": {
+          "trackLastMessageId": true
+        }
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        1312,
+        4048
+      ],
+      "id": "76fcf422-94ed-44c4-b2b9-74aba6b45e95",
+      "name": "Response Mail",
+      "credentials": {
+        "imap": {
+          "id": "1D4DEDGGv5lzFGfE",
+          "name": "info@ethicalintelligent.com"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * 1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1312,
+        4688
+      ],
+      "id": "8e6500e5-82c5-4b7d-9c22-fe40601f6623",
+      "name": "Re send mail",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "72b86690-c664-4a11-8f0d-ca515716ea60",
+              "leftValue": "={{ $json['Email address'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1936,
+        4704
+      ],
+      "id": "c983bb58-509d-43d4-bfe1-8958a3ac9628",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A",
+          "mode": "list",
+          "cachedResultName": "Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10Sdj5UVEywuxw5Cxtfl56TXinP9HC5TiBqH6S8kNO1A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email address": "={{ $('If5').item.json[\"Email address\"] }}",
+            "Mail Content Sent ": "={{ $('Information Extractor2').item.json.output[\"Mail Body\"] }}",
+            "Sent time": "={{$now.toFormat(\"MM-dd-yyyy (h:mm a)\")}}"
+          },
+          "matchingColumns": [
+            "Email address"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email address",
+              "displayName": "Email address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Mail Content Sent ",
+              "displayName": "Mail Content Sent ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Response",
+              "displayName": "Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Sent time",
+              "displayName": "Sent time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Follow Mail sent time ",
+              "displayName": "Follow Mail sent time ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "23f2b9ce-61c4-4424-afdc-5a0340eb06ff",
+      "name": "Update row in sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2624,
+        4688
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "maoU8I6yc1k1frlB",
+          "name": "eitworks3@gmail.com"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Response Mail": [
+      {
+        "json": {
+          "textHtml": "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><meta content=\"text/html;charset=UTF-8\" http-equiv=\"Content-Type\"></head><body ><div style=\"font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt;\"><p data-end=\"200\" data-start=\"183\">Hello XXX Team,<br></p><p data-end=\"415\" data-start=\"202\">Iâm contacting you on behalf of <b data-end=\"264\" data-start=\"234\">TechNova Solutions Pvt Ltd</b>. Our company is exploring <b data-end=\"323\" data-start=\"291\">IoT and automation solutions</b> for our operations, and we are interested in receiving more details about your offerings.<br></p><p data-end=\"714\" data-start=\"417\">We would appreciate it if you could <b data-end=\"482\" data-start=\"453\">share pricing information</b> and any relevant materials that can help us evaluate your solutions. The best point of contact is our <b data-end=\"607\" data-start=\"585\">Head of Technology</b>, and we are located in <b data-end=\"640\" data-start=\"631\">India</b>. Our website is <a href=\"https://technovasolutions.com\" class=\"decorated-link\" target=\"_new\" rel=\"noopener\" data-end=\"711\" data-start=\"657\">technovasolutions.com</a>.<br></p><p data-end=\"751\" data-start=\"716\">Looking forward to your response.<br></p><p data-end=\"829\" data-start=\"753\"></p><div>Best regards,<br></div><div>&nbsp;mohamed<br></div><div> n8n developer<br></div><div> TechNova Solutions Pvt Ltd<br></div><p></p><div><br></div></div><br></body></html>",
+          "textPlain": "Hello XXX Team,\r\n\r\nIâm contacting you on behalf of TechNova Solutions Pvt Ltd. Our company is exploring IoT and automation solutions for our operations, and we are interested in receiving more details about your offerings.\r\n\r\nWe would appreciate it if you could share pricing information and any relevant materials that can help us evaluate your solutions. The best point of contact is our Head of Technology, and we are located in India. Our website is https://technovasolutions.com .\r\n\r\nLooking forward to your response.\r\n\r\n\r\nBest regards,\r\n\r\nÂ mohamed\r\n\r\n n8n developer\r\n\r\n TechNova Solutions Pvt Ltd",
+          "metadata": {
+            "delivered-to": "info@ethicalintelligent.com",
+            "return-path": "<sabirudeen@ethicalintelligent.com>",
+            "arc-seal": "i=1; a=rsa-sha256; t=1766747460; cv=none; \td=zohomail.in; s=zohoarc; \tb=QesU6bNhxmTN9scmIBtVH4JWdoLSdaWqWnEsnf12CvdTVKUmoWCq1hQwaG7ZAaH5jIeS6PifwsNKuzMyIhqyDDyw2zi0IaajbO5ivv8kRSb71Fh1VCHlITQGFlvj8ofDlEZVadJsxyufpJ+yqSuGQ2K8GpciuSS37XBpWVFFOX0=",
+            "arc-message-signature": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; \tt=1766747460; h=Content-Type:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; \tbh=YkTeffIhkUxDARHDJwQxjcN/peBz1C/EJu7MCXUHmEs=; \tb=Jetpwo/s+dVnzP/WdZe6pOSj30bmd80uVSwL0b01wJI/7gDlnD7SqFlyxYCAGXNtUTwxbQsRmGLMS7kwrTUKUMC9ubi8nINCXv8iwKGIhxK4EDIWd7XWIoT0Puplp9hr+pyKYThh9zQx7EjZACsZCmvlrT2tuwuDAnl08Do5oGI=",
+            "arc-authentication-results": "i=1; mx.zohomail.in;\tdkim=pass  header.i=ethicalintelligent.com;\tspf=pass  smtp.mailfrom=sabirudeen@ethicalintelligent.com;\tdmarc=pass header.from=<sabirudeen@ethicalintelligent.com>",
+            "dkim-signature": "v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1766747460;\ts=zmail; d=ethicalintelligent.com;\ti=sabirudeen@ethicalintelligent.com;\th=Date:Date:From:From:To:To:Message-Id:Message-Id:Subject:Subject:MIME-Version:Content-Type:Reply-To:Cc;\tbh=YkTeffIhkUxDARHDJwQxjcN/peBz1C/EJu7MCXUHmEs=;\tb=LA230/A+gDN6hufKjgrlZ+l4H/qWI7ILqfJEi813wT6FFRGBxBI5kIkj2npWWURk\t3mhNnOpiKlliF5n2iVR9YF9XhvJE9b5b7tQAI3ncjCyBUJm5DWlwq4Li6BQ6WzpTEMN\tBWRSePA+5AiZoA4AvGJLExTFT4bKnBliKUjxRob8=",
+            "received": "from mail.zoho.in by mx.zoho.in\twith SMTP id 1766747458961375.4501422942043; Fri, 26 Dec 2025 16:40:58 +0530 (IST)",
+            "message-id": "<19b5a5acd86.888f9887311355.988312336750141018@ethicalintelligent.com>",
+            "mime-version": "1.0",
+            "content-type": "multipart/alternative; \tboundary=\"----=_Part_1095219_1285319511.1766747458950\"",
+            "importance": "Medium",
+            "user-agent": "Zoho Mail",
+            "x-mailer": "Zoho Mail",
+            "x-zm-messageid": "1766747460892109700"
+          },
+          "attributes": {
+            "uid": 2867
+          },
+          "date": "Fri, 26 Dec 2025 16:40:58 +0530",
+          "from": "Mohamed Sabirudeen <sabirudeen@ethicalintelligent.com>",
+          "to": "\"Ethical Intelligent Technologies\" <info@ethicalintelligent.com>",
+          "subject": "(No Subject)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many contacts": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a new email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a new email": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "New lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor2": {
+      "main": [
+        [
+          {
+            "node": "Send email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response Mail": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Re send mail": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c03b3f58-cdf9-408d-846d-a2f55fd23229",
+  "meta": {
+    "instanceId": "f396997812cc19e1d10c072f552dce82a7580904c0d7c42ad49f248293b02614"
+  },
+  "id": "QbXwLJeEdjzQaS4M",
+  "tags": []
+}
